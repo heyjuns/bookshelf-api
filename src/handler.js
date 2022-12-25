@@ -26,8 +26,6 @@ const saveBook = (request, h) => {
     readPage,
     reading,
   };
-  books.push(newBook);
-  const isSuccess = books.some((book) => book.id === id);
 
   if (!name) {
     return responseBuilder({
@@ -46,6 +44,9 @@ const saveBook = (request, h) => {
       message: 'Gagal menambahkan buku. readPage tidak boleh lebih besar dari pageCount',
     });
   }
+
+  books.push(newBook);
+  const isSuccess = books.some((book) => book.id === id);
 
   if (isSuccess) {
     return responseBuilder({
@@ -69,13 +70,15 @@ const saveBook = (request, h) => {
 
 getBooksByTerms = ({ name, finished, reading }) => {
   if (name) {
-    return books;
+    const filteredBooks = books.filter((b) => b.name.toLowerCase().includes(name.toLowerCase()));
+    return filteredBooks;
   }
   if (finished) {
-    return books.filter((book) => book.finished === (finished !== 0));
+    const filteredBooks = books.filter((book) => book.finished === (+finished !== 0));
+    return filteredBooks;
   }
   if (reading) {
-    return books.filter((book) => book.reading === (reading !== 0));
+    return books.filter((book) => book.reading === (+reading !== 0));
   }
   return books;
 };
@@ -83,7 +86,6 @@ getBooksByTerms = ({ name, finished, reading }) => {
 const getBooks = (request, h) => {
   const { name, finished, reading } = request.query;
   const sourceBooks = getBooksByTerms({ name, finished, reading });
-
   return responseBuilder({
     h,
     code: 200,
