@@ -1,6 +1,6 @@
 /* eslint-disable no-shadow */
 /* eslint-disable no-undef */
-const { generateId, responseBuilder } = require('./helper');
+const { generateId, responseBuilder, getBooksByTerms } = require('./helper');
 const books = require('./books');
 
 const saveBook = (request, h) => {
@@ -68,24 +68,9 @@ const saveBook = (request, h) => {
   });
 };
 
-getBooksByTerms = ({ name, finished, reading }) => {
-  if (name) {
-    const filteredBooks = books.filter((b) => b.name.toLowerCase().includes(name.toLowerCase()));
-    return filteredBooks;
-  }
-  if (finished) {
-    const filteredBooks = books.filter((book) => book.finished === (+finished !== 0));
-    return filteredBooks;
-  }
-  if (reading) {
-    return books.filter((book) => book.reading === (+reading !== 0));
-  }
-  return books;
-};
-
 const getBooks = (request, h) => {
   const { name, finished, reading } = request.query;
-  const sourceBooks = getBooksByTerms({ name, finished, reading });
+  const sourceBooks = getBooksByTerms(books, { name, finished, reading });
   return responseBuilder({
     h,
     code: 200,
